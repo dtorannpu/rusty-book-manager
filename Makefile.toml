@@ -139,7 +139,7 @@ extend = "set-env-docker"
 command = "docker"
 args = ["compose", "${@}"]
 
-[tasks.compse-up-db]
+[tasks.compose-up-db]
 extend = "set-env-docker"
 command = "docker"
 args = ["compose", "up", "-d", "postgres"]
