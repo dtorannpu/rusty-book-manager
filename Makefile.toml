@@ -127,10 +127,20 @@ extend = "set-env-local"
 command = "docker"
 args = [
     "run", "-it", "--rm",
-    "--network", "host",
-    "-v", "${PWD}:/work",
-    "postgres:15", "psql", "${DATABASE_URL}",
-    "-f", "/work/data/install_setup.sql"
+    "--network", "host", "-v",
+    "${PWD}:/work", "postgres:15", "psql",
+    "${DATABASE_URL}", "${@}"
+]
+
+[tasks.initial-setup]
+extend = "set-env-local"
+command = "docker"
+args = [
+    "run", "-it", "--rm",
+    "--network", "host", "-v",
+    "${PWD}:/work", "postgres:15", "psql",
+    "${DATABASE_URL}",
+    "-f", "/work/data/initial_setup.sql"
 ]
 
 [tasks.compose]
