@@ -1,14 +1,22 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use adapter::database::ConnectionPool;
+use adapter::repository::health::HealthCheckRepositoryImpl;
+use kernel::repository::health::HealthCheckRepository;
+use std::sync::Arc;
+
+#[derive(Clone)]
+pub struct AppRegistry {
+    health_check_repository: Arc<dyn HealthCheckRepository>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl AppRegistry {
+    pub fn new(pool: ConnectionPool) -> Self {
+        let health_check_repository = Arc::new(HealthCheckRepositoryImpl::new(pool.clone()));
+        Self {
+            health_check_repository,
+        }
+    }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    pub fn health_check_repository(&self) -> Arc<dyn HealthCheckRepository> {
+        self.health_check_repository.clone()
     }
 }
