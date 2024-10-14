@@ -36,6 +36,7 @@ JAEGER_PORT = 6831
 [tasks.before-build]
 run_task = { name = [
     "compose-up-db",
+    "migrate",
     "compose-up-redis",
 ] }
 
@@ -112,7 +113,7 @@ extend = "set-env-local"
 install_crate = {crate_name = "sqlx-cli" ,binary = "sqlx", test_arg = "--help", version = "0.7.3"}
 script = '''
 #!/bin/bash
-until sql migrate run --source adapter/migrations; do
+until sqlx migrate run --source adapter/migrations; do
     sleep 1
 done
 '''
@@ -123,15 +124,36 @@ install_crate = {crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", 
 command = "sqlx"
 args = ["${@}", "--source", "adapter/migrations"]
 
+[tasks.sqlx-prepare]
+extend = "set-env-local"
+install_crate = {crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3"}
+command = "cargo"
+args = [
+    "sqlx",
+    "prepare",
+    "--database-url",
+    "${DATABASE_URL}"
+]
+
 [tasks.psql]
 extend = "set-env-local"
 command = "docker"
 args = [
     "run", "-it", "--rm",
-    "--network", "host",
-    "-v", "${PWD}:/work",
-    "postgres:15", "psql", "${DATABASE_URL}",
-    "-f", "/work/data/install_setup.sql"
+    "--network", "host", "-v",
+    "${PWD}:/work", "postgres:15", "psql",
+    "${DATABASE_URL}", "${@}"
+]
+
+[tasks.initial-setup]
+extend = "set-env-local"
+command = "docker"
+args = [
+    "run", "-it", "--rm",
+    "--network", "host", "-v",
+    "${PWD}:/work", "postgres:15", "psql",
+    "${DATABASE_URL}",
+    "-f", "/work/data/initial_setup.sql"
 ]
 
 [tasks.compose]
