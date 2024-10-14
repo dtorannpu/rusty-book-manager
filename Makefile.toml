@@ -36,6 +36,7 @@ JAEGER_PORT = 6831
 [tasks.before-build]
 run_task = { name = [
     "compose-up-db",
+    "migrate",
     "compose-up-redis",
 ] }
 
@@ -110,11 +111,9 @@ run_task = "test"
 [tasks.migrate]
 extend = "set-env-local"
 install_crate = {crate_name = "sqlx-cli" ,binary = "sqlx", test_arg = "--help", version = "0.7.3"}
+script_runner = "@shell"
 script = '''
-#!/bin/bash
-until sql migrate run --source adapter/migrations; do
-    sleep 1
-done
+sqlx migrate run --source adapter/migrations
 '''
 
 [tasks.sqlx]
