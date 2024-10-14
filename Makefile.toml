@@ -111,9 +111,11 @@ run_task = "test"
 [tasks.migrate]
 extend = "set-env-local"
 install_crate = {crate_name = "sqlx-cli" ,binary = "sqlx", test_arg = "--help", version = "0.7.3"}
-script_runner = "@shell"
 script = '''
-sqlx migrate run --source adapter/migrations
+#!/bin/bash
+until sqlx migrate run --source adapter/migrations; do
+    sleep 1
+done
 '''
 
 [tasks.sqlx]
