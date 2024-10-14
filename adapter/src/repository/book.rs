@@ -1,11 +1,11 @@
+use crate::database::model::book::BookRow;
+use crate::database::ConnectionPool;
 use async_trait::async_trait;
 use derive_new::new;
-use uuid::Uuid;
-use kernel::model::book::Book;
 use kernel::model::book::event::CreateBook;
+use kernel::model::book::Book;
 use kernel::repository::book::BookRepository;
-use crate::database::ConnectionPool;
-use crate::database::model::book::BookRow;
+use uuid::Uuid;
 
 #[derive(new)]
 pub struct BookRepositoryImpl {
@@ -25,8 +25,8 @@ impl BookRepository for BookRepositoryImpl {
             event.isbn,
             event.description
         )
-            .execute(self.db.inner_ref())
-            .await?;
+        .execute(self.db.inner_ref())
+        .await?;
 
         Ok(())
     }
@@ -45,8 +45,8 @@ impl BookRepository for BookRepositoryImpl {
                 ORDER BY created_at DESC
             "#
         )
-            .fetch_all(self.db.inner_ref())
-            .await?;
+        .fetch_all(self.db.inner_ref())
+        .await?;
 
         Ok(rows.into_iter().map(Book::from).collect())
     }
@@ -66,8 +66,8 @@ impl BookRepository for BookRepositoryImpl {
             "#,
             book_id
         )
-            .fetch_optional(self.db.inner_ref())
-            .await?;
+        .fetch_optional(self.db.inner_ref())
+        .await?;
 
         Ok(row.map(Book::from))
     }
@@ -85,7 +85,7 @@ mod tests {
             title: "Test Title".into(),
             author: "Test Author".into(),
             isbn: "Test ISBN".into(),
-            description: "Test Description".into()
+            description: "Test Description".into(),
         };
 
         repo.create(book).await?;
@@ -102,7 +102,7 @@ mod tests {
             title,
             author,
             isbn,
-            description
+            description,
         } = res.unwrap();
         assert_eq!(id, book_id);
         assert_eq!(title, "Test Title");
