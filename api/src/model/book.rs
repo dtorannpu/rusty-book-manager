@@ -1,6 +1,6 @@
 use kernel::model::book::{event::CreateBook, Book};
-use serde::{Deserialize, Serialize};
 use kernel::model::id::BookId;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
