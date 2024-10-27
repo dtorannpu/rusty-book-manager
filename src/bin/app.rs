@@ -2,6 +2,7 @@ use std::net::{Ipv4Addr, SocketAddr};
 
 use adapter::database::connect_database_with;
 use anyhow::{Error, Result};
+use api::route::book::build_book_routers;
 use api::route::health::build_helth_check_routes;
 use axum::Router;
 use registry::AppRegistry;
@@ -19,6 +20,7 @@ async fn bootstrap() -> Result<()> {
     let registry = AppRegistry::new(pool);
     let app = Router::new()
         .merge(build_helth_check_routes())
+        .merge(build_book_routers())
         .with_state(registry);
     let addr = SocketAddr::new(Ipv4Addr::LOCALHOST.into(), 8080);
     let listener = TcpListener::bind(&addr).await?;

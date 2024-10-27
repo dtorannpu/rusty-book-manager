@@ -2,11 +2,10 @@
 default_to_workspace = false
 
 [env]
-GLOBAL = "global env"
 HOST = "0.0.0.0"
-PORT = 18080
+PORT = 8080
 DATABASE_USERNAME = "app"
-DATABASE_PASSWORD = "password"
+DATABASE_PASSWORD = "passwd"
 DATABASE_NAME = "app"
 DATABASE_PORT_OUTER = 5432
 DATABASE_PORT_INNER = 5432
@@ -14,6 +13,7 @@ REDIS_PORT_OUTER = 6379
 REDIS_PORT_INNER = 6379
 AUTH_TOKEN_TTL = 86400
 
+# Docker Composeのネットワーク内でのDB等への接続情報
 [tasks.set-env-docker.env]
 DATABASE_HOST = "postgres"
 DATABASE_PORT = "${DATABASE_PORT_INNER}"
@@ -23,8 +23,8 @@ REDIS_PORT = "${REDIS_PORT_INNER}"
 JAEGER_HOST = "jaeger"
 JAEGER_PORT = 6831
 
+# Docker Compose外からDB等にアクセスする際の接続情報
 [tasks.set-env-local.env]
-LOCAL = "local env"
 DATABASE_HOST = "localhost"
 DATABASE_PORT = "${DATABASE_PORT_OUTER}"
 DATABASE_URL = "postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?user=${DATABASE_USERNAME}&password=${DATABASE_PASSWORD}"
@@ -33,12 +33,15 @@ REDIS_PORT = "${REDIS_PORT_OUTER}"
 JAEGER_HOST = "localhost"
 JAEGER_PORT = 6831
 
+
 [tasks.before-build]
-run_task = { name = [
-    "compose-up-db",
-    "migrate",
-    "compose-up-redis",
-] }
+run_task = [
+    { name = [
+        "compose-up-db",
+        "migrate",
+        "compose-up-redis",
+    ] },
+]
 
 [tasks.compose-build-app]
 extend = "set-env-local"
@@ -78,10 +81,13 @@ dependencies = ["before-build"]
 command = "cargo"
 args = ["check"]
 
+
+### Development
+
 [tasks.watch]
 extend = "set-env-local"
 dependencies = ["before-build"]
-run_task = { name = ["fmt", "clippy", "test"] }
+run_task = [{ name = ["fmt", "clippy", "test"] }]
 watch = true
 
 [tasks.fmt]
@@ -96,21 +102,31 @@ args = ["clippy", "--all", "--all-targets", "${@}"]
 
 [tasks.test]
 extend = "set-env-local"
-install_crate = { crate_name = "cargo-nextest", binary = "cargo", test_arg = ["nextest", "--help"] }
+install_crate = { crate_name = "cargo-nextest", binary = "cargo", test_arg = [
+    "nextest", "--help",
+] }
 command = "cargo"
-args = ["nextest", "run", "--workspace", "--status-level", "all", "--test-threads=1"]
+args = [
+    "nextest", "run", "--workspace",
+    "--status-level", "all", "--test-threads=1",
+]
 
 [tasks.clippy-ci]
+extend = "set-env-local"
 dependencies = ["before-build"]
-run_task = "clippy"
+command = "cargo"
+args = ["clippy", "--", "--no-deps", "-Dwarnings"]
 
 [tasks.test-ci]
 dependencies = ["before-build"]
 run_task = "test"
 
+
+### Migration
+
 [tasks.migrate]
 extend = "set-env-local"
-install_crate = {crate_name = "sqlx-cli" ,binary = "sqlx", test_arg = "--help", version = "0.7.3"}
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3" }
 script = '''
 #!/bin/bash
 until sqlx migrate run --source adapter/migrations; do
@@ -120,29 +136,18 @@ done
 
 [tasks.sqlx]
 extend = "set-env-local"
-install_crate = {crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3"}
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3" }
 command = "sqlx"
 args = ["${@}", "--source", "adapter/migrations"]
-
-[tasks.sqlx-prepare]
-extend = "set-env-local"
-install_crate = {crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3"}
-command = "cargo"
-args = [
-    "sqlx",
-    "prepare",
-    "--database-url",
-    "${DATABASE_URL}"
-]
 
 [tasks.psql]
 extend = "set-env-local"
 command = "docker"
 args = [
     "run", "-it", "--rm",
-    "--network", "host", "-v",
-    "${PWD}:/work", "postgres:15", "psql",
-    "${DATABASE_URL}", "${@}"
+    "--network", "host",
+    "-v", "${PWD}:/work",
+    "postgres:15", "psql", "${DATABASE_URL}", "${@}"
 ]
 
 [tasks.initial-setup]
@@ -150,11 +155,14 @@ extend = "set-env-local"
 command = "docker"
 args = [
     "run", "-it", "--rm",
-    "--network", "host", "-v",
-    "${PWD}:/work", "postgres:15", "psql",
-    "${DATABASE_URL}",
+    "--network", "host",
+    "-v", "${PWD}:/work",
+    "postgres:15", "psql", "${DATABASE_URL}",
     "-f", "/work/data/initial_setup.sql"
 ]
+
+
+### Docker Compose
 
 [tasks.compose]
 extend = "set-env-docker"
@@ -180,3 +188,18 @@ args = ["compose", "down"]
 extend = "set-env-docker"
 command = "docker"
 args = ["compose", "down", "-v"]
+
+
+[tasks.create-hash]
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//! bcrypt = "0.15.1"
+//! ```
+fn main() {
+    let password = &std::env::args().collect::<Vec<String>>()[1];
+    let hashed = bcrypt::hash(password, bcrypt::DEFAULT_COST).unwrap();
+    println!("{}", hashed);
+}
+'''
