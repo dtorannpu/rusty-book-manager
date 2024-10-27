@@ -4,8 +4,9 @@ use async_trait::async_trait;
 use derive_new::new;
 use kernel::model::book::event::CreateBook;
 use kernel::model::book::Book;
+use kernel::model::id::BookId;
 use kernel::repository::book::BookRepository;
-use uuid::Uuid;
+use shared::error::{AppError, AppResult};
 
 #[derive(new)]
 pub struct BookRepositoryImpl {
@@ -14,7 +15,7 @@ pub struct BookRepositoryImpl {
 
 #[async_trait]
 impl BookRepository for BookRepositoryImpl {
-    async fn create(&self, event: CreateBook) -> anyhow::Result<()> {
+    async fn create(&self, event: CreateBook) -> AppResult<()> {
         sqlx::query!(
             r#"
                 INSERT INTO books (title, author, isbn, description)
@@ -26,12 +27,13 @@ impl BookRepository for BookRepositoryImpl {
             event.description
         )
         .execute(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(AppError::SpecificOperationError)?;
 
         Ok(())
     }
 
-    async fn find_all(&self) -> anyhow::Result<Vec<Book>> {
+    async fn find_all(&self) -> AppResult<Vec<Book>> {
         let rows: Vec<BookRow> = sqlx::query_as!(
             BookRow,
             r#"
@@ -46,12 +48,13 @@ impl BookRepository for BookRepositoryImpl {
             "#
         )
         .fetch_all(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(AppError::SpecificOperationError)?;
 
         Ok(rows.into_iter().map(Book::from).collect())
     }
 
-    async fn find_by_id(&self, book_id: Uuid) -> anyhow::Result<Option<Book>> {
+    async fn find_by_id(&self, book_id: BookId) -> AppResult<Option<Book>> {
         let row: Option<BookRow> = sqlx::query_as!(
             BookRow,
             r#"
@@ -64,10 +67,11 @@ impl BookRepository for BookRepositoryImpl {
                 FROM books
                 WHERE book_id = $1
             "#,
-            book_id
+            book_id as _
         )
         .fetch_optional(self.db.inner_ref())
-        .await?;
+        .await
+        .map_err(AppError::SpecificOperationError)?;
 
         Ok(row.map(Book::from))
     }
