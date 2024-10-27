@@ -35,13 +35,7 @@ JAEGER_PORT = 6831
 
 
 [tasks.before-build]
-run_task = [
-    { name = [
-        "compose-up-db",
-        "migrate",
-        "compose-up-redis",
-    ] },
-]
+run_task ={ name = ["compose-up-db", "migrate", "compose-up-redis"] }
 
 [tasks.compose-build-app]
 extend = "set-env-local"
@@ -87,7 +81,7 @@ args = ["check"]
 [tasks.watch]
 extend = "set-env-local"
 dependencies = ["before-build"]
-run_task = [{ name = ["fmt", "clippy", "test"] }]
+run_task = { name = ["fmt", "clippy", "test"] }
 watch = true
 
 [tasks.fmt]
