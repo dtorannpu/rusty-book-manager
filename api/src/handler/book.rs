@@ -1,35 +1,49 @@
-use crate::model::book::{BookResponse, CreateBookRequest};
-use axum::extract::{Path, State};
+use crate::model::book::{UpdateBookRequest, UpdateBookRequestWithIds};
+use crate::{
+    extractor::AuthorizedUser,
+    model::book::{BookListQuery, BookResponse, CreateBookRequest, PaginatedBookResponse},
+};
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::Json;
+use garde::Validate;
+use kernel::model::book::event::DeleteBook;
 use kernel::model::id::BookId;
 use registry::AppRegistry;
 use shared::error::{AppError, AppResult};
 
 pub async fn register_book(
+    user: AuthorizedUser,
     State(registry): State<AppRegistry>,
     Json(req): Json<CreateBookRequest>,
 ) -> AppResult<StatusCode> {
+    req.validate(&())?;
+
     registry
         .book_repository()
-        .create(req.into())
+        .create(req.into(), user.id())
         .await
         .map(|_| StatusCode::CREATED)
 }
 
 pub async fn show_book_list(
+    _user: AuthorizedUser,
+    Query(query): Query<BookListQuery>,
     State(registry): State<AppRegistry>,
-) -> AppResult<Json<Vec<BookResponse>>> {
+) -> AppResult<Json<PaginatedBookResponse>> {
+    query.validate(&())?;
+
     registry
         .book_repository()
-        .find_all()
+        .find_all(query.into())
         .await
-        .map(|v| v.into_iter().map(BookResponse::from).collect::<Vec<_>>())
+        .map(PaginatedBookResponse::from)
         .map(Json)
         .map_err(AppError::from)
 }
 
 pub async fn show_book(
+    _user: AuthorizedUser,
     Path(book_id): Path<BookId>,
     State(registry): State<AppRegistry>,
 ) -> AppResult<Json<BookResponse>> {
@@ -42,4 +56,36 @@ pub async fn show_book(
 
             None => Err(AppError::EntityNotFound("not found".into())),
         })
+}
+
+pub async fn update_book(
+    user: AuthorizedUser,
+    Path(book_id): Path<BookId>,
+    State(registry): State<AppRegistry>,
+    Json(req): Json<UpdateBookRequest>,
+) -> AppResult<StatusCode> {
+    req.validate(&())?;
+    let update_book = UpdateBookRequestWithIds::new(book_id, user.id(), req);
+
+    registry
+        .book_repository()
+        .update(update_book.into())
+        .await
+        .map(|_| StatusCode::OK)
+}
+
+pub async fn delete_book(
+    user: AuthorizedUser,
+    Path(book_id): Path<BookId>,
+    State(registry): State<AppRegistry>,
+) -> AppResult<StatusCode> {
+    let delete_book = DeleteBook {
+        book_id,
+        requested_user: user.id(),
+    };
+    registry
+        .book_repository()
+        .delete(delete_book)
+        .await
+        .map(|_| StatusCode::OK)
 }
