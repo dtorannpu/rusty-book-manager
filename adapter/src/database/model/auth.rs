@@ -14,7 +14,10 @@ pub struct AuthorizationKey(String);
 pub struct AuthorizedUserId(UserId);
 
 pub fn from(event: CreateToken) -> (AuthorizationKey, AuthorizedUserId) {
-    (AuthorizationKey(event.access_token), AuthorizedUserId(event.user_id))
+    (
+        AuthorizationKey(event.access_token),
+        AuthorizedUserId(event.user_id),
+    )
 }
 
 impl From<AuthorizationKey> for AccessToken {

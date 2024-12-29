@@ -25,7 +25,11 @@ impl AppConfig {
             ttl: std::env::var("AUTH_TOKEN_TTL")?.parse::<u64>()?,
         };
 
-        Ok(Self { database, redis, auth })
+        Ok(Self {
+            database,
+            redis,
+            auth,
+        })
     }
 }
 

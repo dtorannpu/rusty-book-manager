@@ -1,15 +1,15 @@
 use adapter::database::ConnectionPool;
-use adapter::repository::book::BookRepositoryImpl;
-use adapter::repository::health::HealthCheckRepositoryImpl;
-use kernel::repository::book::BookRepository;
-use kernel::repository::health::HealthCheckRepository;
-use std::sync::Arc;
 use adapter::redis::RedisClient;
 use adapter::repository::auth::AuthRepositoryImpl;
+use adapter::repository::book::BookRepositoryImpl;
+use adapter::repository::health::HealthCheckRepositoryImpl;
 use adapter::repository::user::UserRepositoryImpl;
 use kernel::repository::auth::AuthRepository;
+use kernel::repository::book::BookRepository;
+use kernel::repository::health::HealthCheckRepository;
 use kernel::repository::user::UserRepository;
 use shared::config::AppConfig;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AppRegistry {
@@ -20,10 +20,18 @@ pub struct AppRegistry {
 }
 
 impl AppRegistry {
-    pub fn new(pool: ConnectionPool, redis_client: Arc<RedisClient>, app_config: AppConfig) -> Self {
+    pub fn new(
+        pool: ConnectionPool,
+        redis_client: Arc<RedisClient>,
+        app_config: AppConfig,
+    ) -> Self {
         let health_check_repository = Arc::new(HealthCheckRepositoryImpl::new(pool.clone()));
         let book_repository = Arc::new(BookRepositoryImpl::new(pool.clone()));
-        let auth_repository = Arc::new(AuthRepositoryImpl::new(pool.clone(), redis_client.clone(), app_config.auth.ttl));
+        let auth_repository = Arc::new(AuthRepositoryImpl::new(
+            pool.clone(),
+            redis_client.clone(),
+            app_config.auth.ttl,
+        ));
         let user_repository = Arc::new(UserRepositoryImpl::new(pool.clone()));
 
         Self {

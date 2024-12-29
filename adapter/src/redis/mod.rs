@@ -29,7 +29,7 @@ impl RedisClient {
 
     pub async fn delete<T: RedisKey>(&self, key: &T) -> AppResult<()> {
         let mut conn = self.client.get_multiplexed_async_connection().await?;
-        let _:() = conn.del(key.inner()).await?;
+        let _: () = conn.del(key.inner()).await?;
         Ok(())
     }
 

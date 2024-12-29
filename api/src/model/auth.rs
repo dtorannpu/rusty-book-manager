@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use kernel::model::id::UserId;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]

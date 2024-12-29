@@ -1,9 +1,9 @@
-use std::str::FromStr;
 use chrono::{DateTime, Utc};
 use kernel::model::id::UserId;
 use kernel::model::role::Role;
 use kernel::model::user::User;
 use shared::error::AppError;
+use std::str::FromStr;
 
 pub struct UserRow {
     pub user_id: UserId,

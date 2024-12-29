@@ -1,8 +1,8 @@
-use axum::{async_trait, RequestPartsExt};
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
-use axum_extra::headers::Authorization;
+use axum::{async_trait, RequestPartsExt};
 use axum_extra::headers::authorization::Bearer;
+use axum_extra::headers::Authorization;
 use axum_extra::TypedHeader;
 use kernel::model::auth::AccessToken;
 use kernel::model::id::UserId;
@@ -55,4 +55,3 @@ impl FromRequestParts<AppRegistry> for AuthorizedUser {
         Ok(Self { access_token, user })
     }
 }
-

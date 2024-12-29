@@ -1,6 +1,6 @@
 use shared::config::DatabaseConfig;
-use sqlx::{postgres::PgConnectOptions, PgPool};
 use shared::error::{AppError, AppResult};
+use sqlx::{postgres::PgConnectOptions, PgPool};
 
 pub mod model;
 
@@ -25,9 +25,7 @@ impl ConnectionPool {
         &self.0
     }
 
-    pub async fn begin(
-        &self,
-    ) -> AppResult<sqlx::Transaction<'_, sqlx::Postgres>> {
+    pub async fn begin(&self) -> AppResult<sqlx::Transaction<'_, sqlx::Postgres>> {
         self.0.begin().await.map_err(AppError::TransactionError)
     }
 }

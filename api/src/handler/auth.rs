@@ -1,14 +1,16 @@
+use crate::extractor::AuthorizedUser;
+use crate::model::auth::{AccessTokenResponse, LoginRequest};
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::Json;
 use kernel::model::auth::event::CreateToken;
 use registry::AppRegistry;
 use shared::error::AppResult;
-use crate::extractor::AuthorizedUser;
-use crate::model::auth::{AccessTokenResponse, LoginRequest};
 
-pub async fn login(State(registry): State<AppRegistry>,
-                   Json(req): Json<LoginRequest>) -> AppResult<Json<AccessTokenResponse>> {
+pub async fn login(
+    State(registry): State<AppRegistry>,
+    Json(req): Json<LoginRequest>,
+) -> AppResult<Json<AccessTokenResponse>> {
     let user_id = registry
         .auth_repository()
         .verify_user(&req.email, &req.password)
@@ -24,7 +26,10 @@ pub async fn login(State(registry): State<AppRegistry>,
     }))
 }
 
-pub async fn logout(user: AuthorizedUser, State(registry): State<AppRegistry>) -> AppResult<StatusCode> {
+pub async fn logout(
+    user: AuthorizedUser,
+    State(registry): State<AppRegistry>,
+) -> AppResult<StatusCode> {
     registry
         .auth_repository()
         .delete_token(user.access_token)
