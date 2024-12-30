@@ -5,6 +5,7 @@ use crate::model::list::PaginatedList;
 use async_trait::async_trait;
 use shared::error::AppResult;
 
+#[mockall::automock]
 #[async_trait]
 pub trait BookRepository: Send + Sync {
     async fn create(&self, event: CreateBook, user_id: UserId) -> AppResult<()>;
