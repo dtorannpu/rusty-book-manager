@@ -1,13 +1,14 @@
-use crate::database::model::book::{BookRow, PaginatedBookRow};
+use crate::database::model::book::{BookCheckoutRow, BookRow, PaginatedBookRow};
 use crate::database::ConnectionPool;
 use async_trait::async_trait;
 use derive_new::new;
 use kernel::model::book::event::{CreateBook, DeleteBook, UpdateBook};
-use kernel::model::book::{Book, BookListOptions};
+use kernel::model::book::{Book, BookListOptions, Checkout};
 use kernel::model::id::{BookId, UserId};
 use kernel::model::list::PaginatedList;
 use kernel::repository::book::BookRepository;
 use shared::error::{AppError, AppResult};
+use std::collections::HashMap;
 
 #[derive(new)]
 pub struct BookRepositoryImpl {
@@ -81,7 +82,16 @@ impl BookRepository for BookRepositoryImpl {
         .await
         .map_err(AppError::SpecificOperationError)?;
 
-        let items = rows.into_iter().map(Book::from).collect();
+        let book_ids = rows.iter().map(|book| book.book_id).collect::<Vec<_>>();
+        let mut checkouts = self.find_checkouts(&book_ids).await?;
+
+        let items = rows
+            .into_iter()
+            .map(|row| {
+                let checkout = checkouts.remove(&row.book_id);
+                row.into_book(checkout)
+            })
+            .collect();
 
         Ok(PaginatedList {
             total,
@@ -113,7 +123,13 @@ impl BookRepository for BookRepositoryImpl {
         .await
         .map_err(AppError::SpecificOperationError)?;
 
-        Ok(row.map(Book::from))
+        match row {
+            Some(r) => {
+                let checkout = self.find_checkouts(&[r.book_id]).await?.remove(&r.book_id);
+                Ok(Some(r.into_book(checkout)))
+            }
+            None => Ok(None),
+        }
     }
 
     async fn update(&self, event: UpdateBook) -> AppResult<()> {
@@ -168,11 +184,44 @@ impl BookRepository for BookRepositoryImpl {
     }
 }
 
+impl BookRepositoryImpl {
+    async fn find_checkouts(&self, book_ids: &[BookId]) -> AppResult<HashMap<BookId, Checkout>> {
+        let res = sqlx::query_as!(
+            BookCheckoutRow,
+            r#"
+                SELECT
+                    c.checkout_id,
+                    c.book_id,
+                    u.user_id,
+                    u.name AS user_name,
+                    c.checked_out_at
+                FROM checkouts AS c
+                INNER JOIN users AS u USING(user_id)
+                WHERE book_id = ANY($1)
+                ;
+            "#,
+            book_ids as _
+        )
+        .fetch_all(self.db.inner_ref())
+        .await
+        .map_err(AppError::SpecificOperationError)?
+        .into_iter()
+        .map(|checkout| (checkout.book_id, Checkout::from(checkout)))
+        .collect();
+
+        Ok(res)
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::database::ConnectionPool;
+    use crate::repository::book::BookRepositoryImpl;
     use crate::repository::user::UserRepositoryImpl;
+    use kernel::model::book::event::CreateBook;
+    use kernel::model::book::{Book, BookListOptions};
     use kernel::model::user::event::CreateUser;
+    use kernel::repository::book::BookRepository;
     use kernel::repository::user::UserRepository;
 
     #[sqlx::test]
@@ -217,6 +266,7 @@ mod tests {
             isbn,
             description,
             owner,
+            ..
         } = res.unwrap();
         assert_eq!(id, book_id);
         assert_eq!(title, "Test Title");

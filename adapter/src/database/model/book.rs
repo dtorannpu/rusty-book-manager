@@ -1,6 +1,7 @@
-use kernel::model::book::Book;
-use kernel::model::id::{BookId, UserId};
-use kernel::model::user::BookOwner;
+use chrono::{DateTime, Utc};
+use kernel::model::book::{Book, Checkout};
+use kernel::model::id::{BookId, CheckoutId, UserId};
+use kernel::model::user::{BookOwner, CheckoutUser};
 
 pub struct BookRow {
     pub book_id: BookId,
@@ -13,8 +14,8 @@ pub struct BookRow {
     pub owner_name: String,
 }
 
-impl From<BookRow> for Book {
-    fn from(value: BookRow) -> Self {
+impl BookRow {
+    pub fn into_book(self, checkout: Option<Checkout>) -> Book {
         let BookRow {
             book_id,
             title,
@@ -23,8 +24,8 @@ impl From<BookRow> for Book {
             description,
             owned_by,
             owner_name,
-        } = value;
-        Self {
+        } = self;
+        Book {
             id: book_id,
             title,
             author,
@@ -34,6 +35,7 @@ impl From<BookRow> for Book {
                 id: owned_by,
                 name: owner_name,
             },
+            checkout,
         }
     }
 }
@@ -41,4 +43,32 @@ impl From<BookRow> for Book {
 pub struct PaginatedBookRow {
     pub total: i64,
     pub id: BookId,
+}
+
+pub struct BookCheckoutRow {
+    pub checkout_id: CheckoutId,
+    pub book_id: BookId,
+    pub user_id: UserId,
+    pub user_name: String,
+    pub checked_out_at: DateTime<Utc>,
+}
+
+impl From<BookCheckoutRow> for Checkout {
+    fn from(value: BookCheckoutRow) -> Self {
+        let BookCheckoutRow {
+            checkout_id,
+            book_id: _,
+            user_id,
+            user_name,
+            checked_out_at,
+        } = value;
+        Self {
+            checkout_id,
+            checked_out_by: CheckoutUser {
+                id: user_id,
+                name: user_name,
+            },
+            checked_out_at,
+        }
+    }
 }
