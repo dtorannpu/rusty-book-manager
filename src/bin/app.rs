@@ -2,6 +2,7 @@ use adapter::database::connect_database_with;
 use adapter::redis::RedisClient;
 use anyhow::{Context, Error, Result};
 use api::route::{auth, v1};
+use axum::http::Method;
 use axum::Router;
 use registry::AppRegistry;
 use shared::config::AppConfig;
@@ -9,8 +10,9 @@ use shared::env::{which, Environment};
 use std::net::{Ipv4Addr, SocketAddr};
 use std::sync::Arc;
 use tokio::net::TcpListener;
+use tower_http::cors::CorsLayer;
 use tower_http::trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer};
-use tower_http::LatencyUnit;
+use tower_http::{cors, LatencyUnit};
 use tracing::Level;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -43,6 +45,13 @@ fn init_logger() -> Result<()> {
     Ok(())
 }
 
+fn cors() -> CorsLayer {
+    CorsLayer::new()
+        .allow_headers(cors::Any)
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_origin(cors::Any)
+}
+
 async fn bootstrap() -> Result<()> {
     let app_config = AppConfig::new()?;
     let pool = connect_database_with(&app_config.database);
@@ -61,6 +70,7 @@ async fn bootstrap() -> Result<()> {
                         .latency_unit(LatencyUnit::Millis),
                 ),
         )
+        .layer(cors())
         .with_state(registry);
     let addr = SocketAddr::new(Ipv4Addr::LOCALHOST.into(), 8080);
     let listener = TcpListener::bind(&addr).await?;
