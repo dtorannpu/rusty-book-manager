@@ -117,7 +117,7 @@ async fn bootstrap() -> Result<()> {
 
 async fn shutdown_signal() {
     fn purge_spans() {
-        global::shutdown_tracer_provider();
+        //global::shutdown_tracer_provider();
     }
     let ctrl_c = async {
         tokio::signal::ctrl_c()
