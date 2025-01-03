@@ -12,9 +12,7 @@ async-trait.workspace = true
 bcrypt.workspace = true
 chrono.workspace = true
 derive-new.workspace = true
-secrecy.workspace = true
 sqlx.workspace = true
-redis.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true

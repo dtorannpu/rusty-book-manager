@@ -4,6 +4,10 @@ use anyhow::{Context, Error, Result};
 use api::route::{auth, v1};
 use axum::http::Method;
 use axum::Router;
+use opentelemetry::trace::TracerProvider;
+use opentelemetry::{global, KeyValue};
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::Resource;
 use registry::AppRegistryImpl;
 use shared::config::AppConfig;
 use shared::env::{which, Environment};
@@ -30,16 +34,41 @@ fn init_logger() -> Result<()> {
         Environment::Production => "info",
     };
 
+    // let host = std::env::var("JAEGER_HOST")?;
+    // let port = std::env::var("JAEGER_PORT")?;
+    // let endpoint = format!("{host}:{port}");
+    // let otlp_exporter = opentelemetry_otlp::SpanExporter::builder()
+    //     .with_tonic()
+    //     //.with_endpoint(endpoint)
+    //     .build()?;
+    // // Then pass it into provider builder
+    // let tracer_provider = opentelemetry_sdk::trace::TracerProvider::builder()
+    //     .with_simple_exporter(otlp_exporter)
+    //     .with_batch_exporter(
+    //         opentelemetry_otlp::SpanExporter::builder()
+    //             .with_tonic()
+    //             .build()?,
+    //         opentelemetry_sdk::runtime::Tokio,
+    //     )
+    //     .with_resource(Resource::new(vec![KeyValue::new(
+    //         "service.name",
+    //         "book-manager",
+    //     )]))
+    //     .build();
+    // let tracer = tracer_provider.tracer("sample");
+    // let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer);
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| log_level.into());
 
     let subscriber = tracing_subscriber::fmt::layer()
         .with_file(true)
         .with_line_number(true)
-        .with_target(false);
+        .with_target(false)
+        .json();
 
     tracing_subscriber::registry()
         .with(subscriber)
         .with(env_filter)
+        //.with(opentelemetry)
         .try_init()?;
 
     Ok(())
@@ -77,6 +106,7 @@ async fn bootstrap() -> Result<()> {
     tracing::info!("Listening on {}", addr);
 
     axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .context("Unexpected error happened in server")
         .inspect_err(|e| {
@@ -87,4 +117,38 @@ async fn bootstrap() -> Result<()> {
             )
         })
         .map_err(Error::from)
+}
+
+async fn shutdown_signal() {
+    fn purge_spans() {
+        global::shutdown_tracer_provider();
+    }
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Failed to install CTRL+C signal handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("Failed to install signal handler")
+            .recv()
+            .await
+            .expect("Failed to receive SIGTERM signal");
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending();
+
+    tokio::select! {
+        _= ctrl_c=>{
+            tracing::info!("Ctrl+C を受信しました。");
+            purge_spans();
+        },
+        _ = terminate=>{
+            tracing::info!("SIGTERM を受信しました。");
+            purge_spans();
+        },
+    }
 }
