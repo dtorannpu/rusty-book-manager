@@ -42,9 +42,11 @@ tracing = { version = "0.1.37", default-features = false }
 axum-extra = { version = "0.9.3", features = ["typed-header"], default-features = false }
 tokio-stream = { version = "0.1.14", default-features = false }
 garde = { version = "0.18.0", features = ["derive", "email"] }
+tower-http = { version = "0.5.0", features = ["cors", "trace"] }
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt", "json"], default-features = false }
 
 [dependencies]
-tower-http = { version = "0.5.0", features = ["cors", "trace"] }
+tower-http.workspace = true
 adapter.workspace = true
 api.workspace = true
 registry.workspace = true
@@ -53,7 +55,7 @@ anyhow.workspace = true
 axum.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt", "json"], default-features = false }
+tracing-subscriber.workspace = true
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
