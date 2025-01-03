@@ -23,5 +23,5 @@ garde.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true
-rstest = "0.18.2"
-serde_json = "1.0.105"
+rstest = { version = "0.18.2", default-features = false }
+serde_json = { version = "1.0.105", default-features = false }
