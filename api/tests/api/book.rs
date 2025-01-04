@@ -76,7 +76,7 @@ async fn show_book_list_with_query_200(
 #[case("/books?offset=-1")]
 #[tokio::test]
 async fn show_book_list_with_query_400(
-    mut fixture: registry::MockAppRegistryExt,
+    fixture: registry::MockAppRegistryExt,
     #[case] path: &str,
 ) -> anyhow::Result<()> {
     let app: axum::Router = make_router(fixture);

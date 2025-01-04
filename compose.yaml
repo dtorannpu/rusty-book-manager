@@ -24,6 +24,7 @@ services:
     depends_on:
       - redis
       - postgres
+      - jaeger
 
   redis:
     image: redis:alpine
@@ -42,11 +43,21 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DATABASE_USERNAME}"]
+      test: [ "CMD", "pg_isready", "-U", "${DATABASE_USERNAME}" ]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 30s
+  jaeger:
+    image: jaegertracing/jaeger:${JAEGER_VERSION:-2.1.0}
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "5778:5778"
+      - "9411:9411"
+    environment:
+      - LOG_LEVEL=debug
 
 volumes:
   db:

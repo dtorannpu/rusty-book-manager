@@ -1,11 +1,14 @@
 name: CI for book
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
     paths-ignore:
       - "README.md"
       - "frontend/**"
+
+env:
+  CARGO_INCREMENTAL: 0
 
 jobs:
   check:
@@ -24,7 +27,10 @@ jobs:
       - name: Install cargo-related tool
         uses: taiki-e/install-action@v2
         with:
-          tool: nextest,cargo-make
+          tool: nextest,cargo-make,cargo-machete
+
+      - name: Check unused dependencies
+        run: cargo machete
 
       - name: Tests compile
         run: cargo make test-ci --no-run --locked

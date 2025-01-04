@@ -7,6 +7,8 @@ use kernel::model::auth::event::CreateToken;
 use registry::AppRegistry;
 use shared::error::AppResult;
 
+#[cfg_attr(debug_assertions, utoipa::path(post, path = "/auth/login"))]
+#[tracing::instrument(skip(registry, req))]
 pub async fn login(
     State(registry): State<AppRegistry>,
     Json(req): Json<LoginRequest>,
@@ -26,6 +28,8 @@ pub async fn login(
     }))
 }
 
+#[cfg_attr(debug_assertions, utoipa::path(post, path = "/auth/logout"))]
+#[tracing::instrument(skip(user, registry), fields(user_id = %user.user.id.to_string()))]
 pub async fn logout(
     user: AuthorizedUser,
     State(registry): State<AppRegistry>,
