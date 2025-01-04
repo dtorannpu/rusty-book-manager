@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 use strum::VariantNames;
 use utoipa::ToSchema;
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Serialize, Deserialize, VariantNames)]
 #[strum(serialize_all = "kebab-case")]
 pub enum RoleName {
@@ -69,6 +70,7 @@ impl From<User> for UserResponse {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateUserPasswordRequest {
@@ -98,6 +100,7 @@ impl From<UpdateUserPasswordRequestWithUserId> for UpdateUserPassword {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateUserRequest {
@@ -124,6 +127,7 @@ impl From<CreateUserRequest> for CreateUser {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateUserRoleRequest {
