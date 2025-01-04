@@ -32,20 +32,25 @@ chrono = { version = "0.4.39", default-features = false, features = ["serde"] }
 serde = { version = "1.0.217", default-features = false }
 sqlx = { version = "0.8.3", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
 strum = { version = "0.26.3", features = ["derive"] }
-thiserror = "2.0.9"
+thiserror = { version = "2.0.9", default-features = false }
 tokio = { version = "1.42.0", features = ["rt-multi-thread", "signal"] }
 mockall = "0.13.1"
-redis = { version = "0.27.6", features = ["tokio-comp", "tokio-rustls"], default-features = false }
+redis = { version = "0.27.6", features = ["tokio-comp"], default-features = false }
 bcrypt = { version = "0.16.0", features = ["std"], default-features = false }
-tower = { version = "0.5.2", features = ["util"], default-features = false }
+tower = "0.5.2"
 tracing = { version = "0.1.41", default-features = false }
 axum-extra = { version = "0.9.6", features = ["typed-header"], default-features = false }
 tokio-stream = { version = "0.1.17", default-features = false }
 garde = { version = "0.21.0", features = ["derive", "email"] }
 tower-http = { version = "0.6.2", features = ["cors", "trace"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt", "json"], default-features = false }
-utoipa = { version = "5.3.0", features = ["axum_extras", "uuid", "chrono"] }
+utoipa = { version = "5.3.0", features = ["chrono", "uuid"], default-features = false }
 utoipa-redoc = { version = "5.0.0", features = ["axum"] }
+tracing-opentelemetry = { version = "0.28.0", default-features = false }
+opentelemetry = { version = "0.27.1", default-features = false }
+opentelemetry-otlp = { version = "0.27.0", features = ["grpc-tonic", "trace"], default-features = false }
+opentelemetry_sdk = { version = "0.27.1", features = ["rt-tokio"], default-features = false }
+opentelemetry-semantic-conventions = { version = "0.27.0", features = ["semconv_experimental"] }
 
 [dependencies]
 tower-http.workspace = true
@@ -60,6 +65,11 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 utoipa.workspace = true
 utoipa-redoc.workspace = true
+opentelemetry.workspace = true
+opentelemetry_sdk.workspace = true
+opentelemetry-otlp.workspace = true
+opentelemetry-semantic-conventions.workspace = true
+tracing-opentelemetry.workspace = true
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
