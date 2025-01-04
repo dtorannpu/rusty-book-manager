@@ -28,7 +28,7 @@ pub async fn register_user(
         return Err(AppError::ForbiddenOperation);
     }
 
-    req.validate(&())?;
+    req.validate()?;
 
     let registered_user = registry.user_repository().create(req.into()).await?;
     Ok(Json(registered_user.into()))
@@ -124,7 +124,7 @@ pub async fn change_password(
     State(registry): State<AppRegistry>,
     Json(req): Json<UpdateUserPasswordRequest>,
 ) -> AppResult<StatusCode> {
-    req.validate(&())?;
+    req.validate()?;
 
     registry
         .user_repository()
