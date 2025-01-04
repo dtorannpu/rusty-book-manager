@@ -7,7 +7,9 @@ use kernel::model::book::{event::CreateBook, Book, BookListOptions, Checkout};
 use kernel::model::id::{BookId, CheckoutId, UserId};
 use kernel::model::list::PaginatedList;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateBookRequest {
@@ -38,6 +40,7 @@ impl From<CreateBookRequest> for CreateBook {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Debug, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBookRequest {
@@ -98,9 +101,12 @@ impl From<BookListQuery> for BookListOptions {
         Self { limit, offset }
     }
 }
+
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BookResponse {
+    #[cfg_attr(debug_assertions, schema(value_type = String, format = Uuid))]
     pub id: BookId,
     pub title: String,
     pub author: String,
@@ -133,6 +139,7 @@ impl From<Book> for BookResponse {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PaginatedBookResponse {
@@ -159,9 +166,11 @@ impl From<PaginatedList<Book>> for PaginatedBookResponse {
     }
 }
 
+#[cfg_attr(debug_assertions, derive(ToSchema))]
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BookCheckoutResponse {
+    #[cfg_attr(debug_assertions, schema(value_type = String, format = Uuid))]
     pub id: CheckoutId,
     pub checked_out_by: CheckoutUser,
     pub checked_out_at: DateTime<Utc>,

@@ -20,6 +20,7 @@ strum.workspace = true
 axum-extra.workspace = true
 tokio-stream.workspace = true
 garde.workspace = true
+utoipa.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true

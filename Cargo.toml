@@ -44,6 +44,8 @@ tokio-stream = { version = "0.1.14", default-features = false }
 garde = { version = "0.18.0", features = ["derive", "email"] }
 tower-http = { version = "0.5.0", features = ["cors", "trace"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter", "fmt", "json"], default-features = false }
+utoipa = { version = "4.1.0", features = ["axum_extras", "uuid", "chrono"] }
+utoipa-redoc = { version = "2.0.0", features = ["axum"] }
 
 [dependencies]
 tower-http.workspace = true
@@ -56,6 +58,8 @@ axum.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+utoipa.workspace = true
+utoipa-redoc.workspace = true
 
 [profile.dev.package.sqlx-macros]
 opt-level = 3
