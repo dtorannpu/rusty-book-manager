@@ -4,6 +4,14 @@ use anyhow::{Context, Error, Result};
 use api::route::{auth, v1};
 use axum::http::Method;
 use axum::Router;
+use opentelemetry::{global, trace::TracerProvider as _, KeyValue};
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::trace::TracerProvider;
+use opentelemetry_sdk::{runtime, Resource};
+use opentelemetry_semantic_conventions::{
+    attribute::{DEPLOYMENT_ENVIRONMENT_NAME, SERVICE_NAME, SERVICE_VERSION},
+    SCHEMA_URL,
+};
 use registry::AppRegistryImpl;
 use shared::config::AppConfig;
 use shared::env::{which, Environment};
@@ -31,35 +39,36 @@ async fn main() -> Result<()> {
     bootstrap().await
 }
 
+fn resource() -> Resource {
+    Resource::from_schema_url(
+        [
+            KeyValue::new(SERVICE_NAME, "book-manager"),
+            KeyValue::new(SERVICE_VERSION, "1.0.0"),
+            KeyValue::new(DEPLOYMENT_ENVIRONMENT_NAME, "develop"),
+        ],
+        SCHEMA_URL,
+    )
+}
 fn init_logger() -> Result<()> {
     let log_level = match which() {
         Environment::Development => "debug",
         Environment::Production => "info",
     };
 
-    // let host = std::env::var("JAEGER_HOST")?;
-    // let port = std::env::var("JAEGER_PORT")?;
-    // let endpoint = format!("{host}:{port}");
-    // let otlp_exporter = opentelemetry_otlp::SpanExporter::builder()
-    //     .with_tonic()
-    //     //.with_endpoint(endpoint)
-    //     .build()?;
-    // // Then pass it into provider builder
-    // let tracer_provider = opentelemetry_sdk::trace::TracerProvider::builder()
-    //     .with_simple_exporter(otlp_exporter)
-    //     .with_batch_exporter(
-    //         opentelemetry_otlp::SpanExporter::builder()
-    //             .with_tonic()
-    //             .build()?,
-    //         opentelemetry_sdk::runtime::Tokio,
-    //     )
-    //     .with_resource(Resource::new(vec![KeyValue::new(
-    //         "service.name",
-    //         "book-manager",
-    //     )]))
-    //     .build();
-    // let tracer = tracer_provider.tracer("sample");
-    // let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let host = std::env::var("JAEGER_HOST")?;
+    let port = std::env::var("JAEGER_PORT")?;
+    let endpoint = format!("http://{host}:{port}");
+    println!("Jaeger endpoint {}", endpoint);
+
+    let otlp_exporter = opentelemetry_otlp::SpanExporter::builder()
+        .with_tonic()
+        .with_endpoint(endpoint)
+        .build()?;
+    let tracer_provider = TracerProvider::builder()
+        .with_resource(resource())
+        .with_batch_exporter(otlp_exporter, runtime::Tokio)
+        .build();
+    let tracer = tracer_provider.tracer("tracing-otel-subscriber");
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| log_level.into());
 
     let subscriber = tracing_subscriber::fmt::layer()
@@ -71,7 +80,7 @@ fn init_logger() -> Result<()> {
     tracing_subscriber::registry()
         .with(subscriber)
         .with(env_filter)
-        //.with(opentelemetry)
+        .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .try_init()?;
 
     Ok(())
@@ -125,7 +134,7 @@ async fn bootstrap() -> Result<()> {
 
 async fn shutdown_signal() {
     fn purge_spans() {
-        //global::shutdown_tracer_provider();
+        global::shutdown_tracer_provider();
     }
     let ctrl_c = async {
         tokio::signal::ctrl_c()
@@ -146,7 +155,7 @@ async fn shutdown_signal() {
     let terminate = std::future::pending();
 
     tokio::select! {
-        _= ctrl_c=>{
+        _ = ctrl_c=>{
             tracing::info!("Ctrl+C を受信しました。");
             purge_spans();
         },
