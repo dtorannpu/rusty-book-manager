@@ -21,8 +21,9 @@ axum-extra.workspace = true
 tokio-stream.workspace = true
 garde.workspace = true
 utoipa.workspace = true
+async-trait.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true
 rstest = { version = "0.24.0", default-features = false }
-serde_json = { version = "1.0.134", default-features = false }
+serde_json = { version = "1.0.135", default-features = false }
