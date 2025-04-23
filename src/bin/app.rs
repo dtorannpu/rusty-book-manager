@@ -1,6 +1,6 @@
 use adapter::database::connect_database_with;
 use adapter::redis::RedisClient;
-use anyhow::{Context, Error, Result};
+use anyhow::{Context, Result};
 use api::route::{auth, v1};
 use axum::http::Method;
 use axum::Router;
@@ -129,7 +129,6 @@ async fn bootstrap() -> Result<()> {
                 "Unexpected error"
             )
         })
-        .map_err(Error::from)
 }
 
 async fn shutdown_signal() {
