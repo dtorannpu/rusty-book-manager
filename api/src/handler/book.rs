@@ -76,7 +76,6 @@ pub async fn show_book_list(
         .await
         .map(PaginatedBookResponse::from)
         .map(Json)
-        .map_err(AppError::from)
 }
 
 #[cfg_attr(
