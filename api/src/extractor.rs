@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use axum::extract::FromRequestParts;
+use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
 use axum::RequestPartsExt;
 use axum_extra::headers::authorization::Bearer;
@@ -11,7 +10,6 @@ use kernel::model::role::Role;
 use kernel::model::user::User;
 use registry::AppRegistry;
 use shared::error::AppError;
-use std::future::Future;
 
 pub struct AuthorizedUser {
     pub access_token: AccessToken,
@@ -28,34 +26,34 @@ impl AuthorizedUser {
     }
 }
 
-#[async_trait]
-impl FromRequestParts<AppRegistry> for AuthorizedUser {
+impl<S> FromRequestParts<S> for AuthorizedUser
+where
+    S: Send + Sync,
+    AppRegistry: FromRef<S>,
+{
     type Rejection = AppError;
 
-    fn from_request_parts(
-        parts: &mut Parts,
-        registry: &AppRegistry,
-    ) -> impl Future<Output = Result<Self, Self::Rejection>> + Send {
-        async {
-            let TypedHeader(Authorization(bearer)) = parts
-                .extract::<TypedHeader<Authorization<Bearer>>>()
-                .await
-                .map_err(|_| AppError::UnauthorizedError)?;
-            let access_token = AccessToken(bearer.token().to_string());
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let registry = AppRegistry::from_ref(state);
 
-            let user_id = registry
-                .auth_repository()
-                .fetch_user_id_from_token(&access_token)
-                .await?
-                .ok_or(AppError::UnauthenticatedError)?;
+        let TypedHeader(Authorization(bearer)) = parts
+            .extract::<TypedHeader<Authorization<Bearer>>>()
+            .await
+            .map_err(|_| AppError::UnauthorizedError)?;
+        let access_token = AccessToken(bearer.token().to_string());
 
-            let user = registry
-                .user_repository()
-                .find_current_user(user_id)
-                .await?
-                .ok_or(AppError::UnauthenticatedError)?;
+        let user_id = registry
+            .auth_repository()
+            .fetch_user_id_from_token(&access_token)
+            .await?
+            .ok_or(AppError::UnauthenticatedError)?;
 
-            Ok(Self { access_token, user })
-        }
+        let user = registry
+            .user_repository()
+            .find_current_user(user_id)
+            .await?
+            .ok_or(AppError::UnauthenticatedError)?;
+
+        Ok(Self { access_token, user })
     }
 }
