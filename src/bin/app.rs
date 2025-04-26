@@ -128,8 +128,10 @@ async fn bootstrap(tracer_provider: SdkTracerProvider) -> Result<()> {
 }
 
 async fn shutdown_signal(tracer_provider: SdkTracerProvider) {
-    fn purge_spans(tracer_provider: SdkTracerProvider) {
-        tracer_provider.shutdown().expect("TODO: panic message");
+    fn purge_spans(tracer_provider: &SdkTracerProvider) {
+        tracer_provider
+            .shutdown()
+            .expect("Failed to shut down tracer provider");
     }
     let ctrl_c = async {
         tokio::signal::ctrl_c()
@@ -152,11 +154,11 @@ async fn shutdown_signal(tracer_provider: SdkTracerProvider) {
     tokio::select! {
         _ = ctrl_c=>{
             tracing::info!("Ctrl+C を受信しました。");
-            purge_spans(tracer_provider);
+            purge_spans(&tracer_provider);
         },
         _ = terminate=>{
             tracing::info!("SIGTERM を受信しました。");
-            purge_spans(tracer_provider);
+            purge_spans(&tracer_provider);
         },
     }
 }
