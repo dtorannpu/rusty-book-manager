@@ -4,14 +4,11 @@ use anyhow::{Context, Result};
 use api::route::{auth, v1};
 use axum::http::Method;
 use axum::Router;
-use opentelemetry::{global, trace::TracerProvider as _, KeyValue};
+use opentelemetry::{trace::TracerProvider as _, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::trace::TracerProvider;
-use opentelemetry_sdk::{runtime, Resource};
-use opentelemetry_semantic_conventions::{
-    attribute::{DEPLOYMENT_ENVIRONMENT_NAME, SERVICE_NAME, SERVICE_VERSION},
-    SCHEMA_URL,
-};
+use opentelemetry_sdk::trace::SdkTracerProvider;
+use opentelemetry_sdk::Resource;
+use opentelemetry_semantic_conventions::attribute::{DEPLOYMENT_ENVIRONMENT_NAME, SERVICE_VERSION};
 use registry::{AppRegistry, AppRegistryImpl};
 use shared::config::AppConfig;
 use shared::env::{which, Environment};
@@ -35,21 +32,19 @@ use utoipa_redoc::{Redoc, Servable};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    init_logger()?;
-    bootstrap().await
+    let tracer_provider = init_logger()?;
+    bootstrap(tracer_provider).await
 }
 
 fn resource() -> Resource {
-    Resource::from_schema_url(
-        [
-            KeyValue::new(SERVICE_NAME, "book-manager"),
-            KeyValue::new(SERVICE_VERSION, "1.0.0"),
-            KeyValue::new(DEPLOYMENT_ENVIRONMENT_NAME, "develop"),
-        ],
-        SCHEMA_URL,
-    )
+    Resource::builder()
+        .with_service_name("book-manager")
+        .with_attribute(KeyValue::new(SERVICE_VERSION, "1.0.0"))
+        .with_attribute(KeyValue::new(DEPLOYMENT_ENVIRONMENT_NAME, "develop"))
+        .build()
 }
-fn init_logger() -> Result<()> {
+
+fn init_logger() -> Result<SdkTracerProvider> {
     let log_level = match which() {
         Environment::Development => "debug",
         Environment::Production => "info",
@@ -64,10 +59,11 @@ fn init_logger() -> Result<()> {
         .with_tonic()
         .with_endpoint(endpoint)
         .build()?;
-    let tracer_provider = TracerProvider::builder()
+    let tracer_provider = SdkTracerProvider::builder()
         .with_resource(resource())
-        .with_batch_exporter(otlp_exporter, runtime::Tokio)
+        .with_batch_exporter(otlp_exporter)
         .build();
+    opentelemetry::global::set_tracer_provider(tracer_provider.clone());
     let tracer = tracer_provider.tracer("tracing-otel-subscriber");
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| log_level.into());
 
@@ -83,7 +79,7 @@ fn init_logger() -> Result<()> {
         .with(tracing_opentelemetry::layer().with_tracer(tracer))
         .try_init()?;
 
-    Ok(())
+    Ok(tracer_provider)
 }
 
 fn cors() -> CorsLayer {
@@ -93,7 +89,7 @@ fn cors() -> CorsLayer {
         .allow_origin(cors::Any)
 }
 
-async fn bootstrap() -> Result<()> {
+async fn bootstrap(tracer_provider: SdkTracerProvider) -> Result<()> {
     let app_config = AppConfig::new()?;
     let pool = connect_database_with(&app_config.database);
     let kv = Arc::new(RedisClient::new(&app_config.redis)?);
@@ -119,7 +115,7 @@ async fn bootstrap() -> Result<()> {
     tracing::info!("Listening on {}", addr);
 
     axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
+        .with_graceful_shutdown(shutdown_signal(tracer_provider))
         .await
         .context("Unexpected error happened in server")
         .inspect_err(|e| {
@@ -131,9 +127,11 @@ async fn bootstrap() -> Result<()> {
         })
 }
 
-async fn shutdown_signal() {
-    fn purge_spans() {
-        global::shutdown_tracer_provider();
+async fn shutdown_signal(tracer_provider: SdkTracerProvider) {
+    fn purge_spans(tracer_provider: &SdkTracerProvider) {
+        tracer_provider
+            .shutdown()
+            .expect("Failed to shut down tracer provider");
     }
     let ctrl_c = async {
         tokio::signal::ctrl_c()
@@ -156,11 +154,11 @@ async fn shutdown_signal() {
     tokio::select! {
         _ = ctrl_c=>{
             tracing::info!("Ctrl+C を受信しました。");
-            purge_spans();
+            purge_spans(&tracer_provider);
         },
         _ = terminate=>{
             tracing::info!("SIGTERM を受信しました。");
-            purge_spans();
+            purge_spans(&tracer_provider);
         },
     }
 }
