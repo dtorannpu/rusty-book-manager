@@ -97,7 +97,7 @@ async fn bootstrap() -> Result<()> {
     let app_config = AppConfig::new()?;
     let pool = connect_database_with(&app_config.database);
     let kv = Arc::new(RedisClient::new(&app_config.redis)?);
-    let registry= AppRegistry(Arc::new(AppRegistryImpl::new(pool, kv, app_config)));
+    let registry = AppRegistry(Arc::new(AppRegistryImpl::new(pool, kv, app_config)));
     let router = Router::new().merge(v1::routes()).merge(auth::routes());
     #[cfg(debug_assertions)]
     let router = router.merge(Redoc::with_url("/docs", ApiDoc::openapi()));

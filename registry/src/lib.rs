@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use adapter::database::ConnectionPool;
 use adapter::redis::RedisClient;
 use adapter::repository::auth::AuthRepositoryImpl;
@@ -12,6 +11,7 @@ use kernel::repository::checkout::CheckoutRepository;
 use kernel::repository::health::HealthCheckRepository;
 use kernel::repository::user::UserRepository;
 use shared::config::AppConfig;
+use std::ops::Deref;
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -81,7 +81,7 @@ impl AppRegistryExt for AppRegistryImpl {
 }
 
 #[derive(Clone)]
-pub struct AppRegistry(pub Arc<dyn AppRegistryExt + Send + Sync  + 'static>);
+pub struct AppRegistry(pub Arc<dyn AppRegistryExt + Send + Sync + 'static>);
 
 impl From<Arc<dyn AppRegistryExt + Send + Sync + 'static>> for AppRegistry {
     fn from(value: Arc<dyn AppRegistryExt + Send + Sync + 'static>) -> Self {
