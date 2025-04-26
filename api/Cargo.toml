@@ -21,7 +21,6 @@ axum-extra.workspace = true
 tokio-stream.workspace = true
 garde.workspace = true
 utoipa.workspace = true
-async-trait.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true

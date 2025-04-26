@@ -6,7 +6,7 @@ use kernel::{
     model::{auth::AccessToken, id::UserId, role::Role, user::User},
     repository::{auth::MockAuthRepository, user::MockUserRepository},
 };
-use registry::MockAppRegistryExt;
+use registry::{AppRegistry, MockAppRegistryExt};
 use rstest::fixture;
 
 pub fn v1(endpoint: &str) -> String {
@@ -17,7 +17,7 @@ pub fn make_router(registry: MockAppRegistryExt) -> Router {
     Router::new()
         .merge(v1::routes())
         .merge(auth::routes())
-        .with_state(Arc::new(registry))
+        .with_state(AppRegistry(Arc::new(registry)))
 }
 
 #[fixture]

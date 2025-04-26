@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use adapter::database::ConnectionPool;
 use adapter::redis::RedisClient;
 use adapter::repository::auth::AuthRepositoryImpl;
@@ -79,4 +80,19 @@ impl AppRegistryExt for AppRegistryImpl {
     }
 }
 
-pub type AppRegistry = Arc<dyn AppRegistryExt + Send + Sync + 'static>;
+#[derive(Clone)]
+pub struct AppRegistry(pub Arc<dyn AppRegistryExt + Send + Sync  + 'static>);
+
+impl From<Arc<dyn AppRegistryExt + Send + Sync + 'static>> for AppRegistry {
+    fn from(value: Arc<dyn AppRegistryExt + Send + Sync + 'static>) -> Self {
+        Self(value)
+    }
+}
+
+impl Deref for AppRegistry {
+    type Target = Arc<dyn AppRegistryExt + Send + Sync + 'static>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
