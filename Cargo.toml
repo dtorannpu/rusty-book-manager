@@ -13,7 +13,7 @@ path = "src/bin/app.rs"
 members = ["api", "kernel", "adapter", "shared", "registry"]
 
 [workspace.package]
-edition = "2021"
+edition = "2024"
 publish = false
 license = "MIT"
 
