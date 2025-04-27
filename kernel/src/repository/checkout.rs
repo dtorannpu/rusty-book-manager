@@ -1,5 +1,5 @@
-use crate::model::checkout::event::{CreateCheckout, UpdateReturned};
 use crate::model::checkout::Checkout;
+use crate::model::checkout::event::{CreateCheckout, UpdateReturned};
 use crate::model::id::{BookId, UserId};
 use async_trait::async_trait;
 use shared::error::AppResult;

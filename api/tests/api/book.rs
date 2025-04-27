@@ -6,7 +6,7 @@ use tower::ServiceExt;
 
 use crate::{
     deserialize_json,
-    helper::{fixture, make_router, v1, TestRequestExt},
+    helper::{TestRequestExt, fixture, make_router, v1},
 };
 use api::model::book::PaginatedBookResponse;
 use kernel::{

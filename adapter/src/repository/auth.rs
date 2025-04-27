@@ -1,10 +1,10 @@
-use crate::database::model::auth::{from, AuthorizationKey, AuthorizedUserId, UserItem};
 use crate::database::ConnectionPool;
+use crate::database::model::auth::{AuthorizationKey, AuthorizedUserId, UserItem, from};
 use crate::redis::RedisClient;
 use async_trait::async_trait;
 use derive_new::new;
-use kernel::model::auth::event::CreateToken;
 use kernel::model::auth::AccessToken;
+use kernel::model::auth::event::CreateToken;
 use kernel::model::id::UserId;
 use kernel::repository::auth::AuthRepository;
 use shared::error::{AppError, AppResult};

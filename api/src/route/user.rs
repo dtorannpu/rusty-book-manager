@@ -1,6 +1,6 @@
 use axum::{
-    routing::{delete, get, put},
     Router,
+    routing::{delete, get, put},
 };
 use registry::AppRegistry;
 

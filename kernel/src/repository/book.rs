@@ -1,5 +1,5 @@
 use crate::model::book::event::{DeleteBook, UpdateBook};
-use crate::model::book::{event::CreateBook, Book, BookListOptions};
+use crate::model::book::{Book, BookListOptions, event::CreateBook};
 use crate::model::id::{BookId, UserId};
 use crate::model::list::PaginatedList;
 use async_trait::async_trait;

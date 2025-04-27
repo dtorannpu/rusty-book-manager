@@ -1,9 +1,9 @@
+use axum::RequestPartsExt;
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
-use axum::RequestPartsExt;
-use axum_extra::headers::authorization::Bearer;
-use axum_extra::headers::Authorization;
 use axum_extra::TypedHeader;
+use axum_extra::headers::Authorization;
+use axum_extra::headers::authorization::Bearer;
 use kernel::model::auth::AccessToken;
 use kernel::model::id::UserId;
 use kernel::model::role::Role;

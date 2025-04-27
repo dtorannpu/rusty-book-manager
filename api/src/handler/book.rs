@@ -3,9 +3,9 @@ use crate::{
     extractor::AuthorizedUser,
     model::book::{BookListQuery, BookResponse, CreateBookRequest, PaginatedBookResponse},
 };
+use axum::Json;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
-use axum::Json;
 use garde::Validate;
 use kernel::model::book::event::DeleteBook;
 use kernel::model::id::BookId;

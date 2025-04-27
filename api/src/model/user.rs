@@ -4,8 +4,8 @@ use kernel::model::{
     id::UserId,
     role::Role,
     user::{
-        event::{CreateUser, UpdateUserPassword, UpdateUserRole},
         User,
+        event::{CreateUser, UpdateUserPassword, UpdateUserRole},
     },
 };
 use serde::{Deserialize, Serialize};

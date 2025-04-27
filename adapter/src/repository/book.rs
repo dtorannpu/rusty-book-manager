@@ -1,5 +1,5 @@
-use crate::database::model::book::{BookCheckoutRow, BookRow, PaginatedBookRow};
 use crate::database::ConnectionPool;
+use crate::database::model::book::{BookCheckoutRow, BookRow, PaginatedBookRow};
 use async_trait::async_trait;
 use derive_new::new;
 use kernel::model::book::event::{CreateBook, DeleteBook, UpdateBook};

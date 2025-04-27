@@ -1,4 +1,4 @@
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 use registry::AppRegistry;
 
 use crate::handler::health::{health_check, health_check_db};
