@@ -1,7 +1,7 @@
 use axum::{
+    Json,
     extract::{Path, State},
     http::StatusCode,
-    Json,
 };
 use garde::Validate;
 use kernel::model::{id::UserId, user::event::DeleteUser};

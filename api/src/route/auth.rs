@@ -1,6 +1,6 @@
 use crate::handler::auth::{login, logout};
-use axum::routing::post;
 use axum::Router;
+use axum::routing::post;
 use registry::AppRegistry;
 
 pub fn routes() -> Router<AppRegistry> {

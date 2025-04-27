@@ -1,6 +1,6 @@
 use crate::redis::model::{RedisKey, RedisValue};
-use kernel::model::auth::event::CreateToken;
 use kernel::model::auth::AccessToken;
+use kernel::model::auth::event::CreateToken;
 use kernel::model::id::UserId;
 use shared::error::AppError;
 use std::str::FromStr;

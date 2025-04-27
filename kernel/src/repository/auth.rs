@@ -1,5 +1,5 @@
-use crate::model::auth::event::CreateToken;
 use crate::model::auth::AccessToken;
+use crate::model::auth::event::CreateToken;
 use crate::model::id::UserId;
 use async_trait::async_trait;
 use shared::error::AppResult;

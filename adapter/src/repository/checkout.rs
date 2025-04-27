@@ -1,9 +1,9 @@
-use crate::database::model::checkout::{CheckoutRow, CheckoutStateRow, ReturnedCheckoutRow};
 use crate::database::ConnectionPool;
+use crate::database::model::checkout::{CheckoutRow, CheckoutStateRow, ReturnedCheckoutRow};
 use async_trait::async_trait;
 use derive_new::new;
-use kernel::model::checkout::event::{CreateCheckout, UpdateReturned};
 use kernel::model::checkout::Checkout;
+use kernel::model::checkout::event::{CreateCheckout, UpdateReturned};
 use kernel::model::id::{BookId, CheckoutId, UserId};
 use kernel::repository::checkout::CheckoutRepository;
 use shared::error::{AppError, AppResult};
@@ -44,7 +44,7 @@ impl CheckoutRepository for CheckoutRepositoryImpl {
                     return Err(AppError::EntityNotFound(format!(
                         "書籍 ({}) が見つかりませんでした。",
                         event.book_id,
-                    )))
+                    )));
                 }
                 Some(CheckoutStateRow {
                     checkout_id: Some(_),
@@ -53,7 +53,7 @@ impl CheckoutRepository for CheckoutRepositoryImpl {
                     return Err(AppError::UnprocessableEntity(format!(
                         "書籍 ({}) に対する貸出が既に存在します。",
                         event.book_id
-                    )))
+                    )));
                 }
                 _ => {}
             }
@@ -114,7 +114,7 @@ impl CheckoutRepository for CheckoutRepositoryImpl {
                     return Err(AppError::EntityNotFound(format!(
                         "書籍 ({}) が見つかりませんでした。",
                         event.book_id
-                    )))
+                    )));
                 }
                 Some(CheckoutStateRow {
                     checkout_id: Some(c),
@@ -124,7 +124,7 @@ impl CheckoutRepository for CheckoutRepositoryImpl {
                     return Err(AppError::UnprocessableEntity(format!(
                         "指定の貸出 (ID({})), ユーザー ({}), 書籍({})) は返却できません。 ",
                         event.checkout_id, event.returned_by, event.book_id,
-                    )))
+                    )));
                 }
                 _ => {}
             }

@@ -1,6 +1,6 @@
 use crate::model::id::UserId;
-use crate::model::user::event::{CreateUser, DeleteUser, UpdateUserPassword, UpdateUserRole};
 use crate::model::user::User;
+use crate::model::user::event::{CreateUser, DeleteUser, UpdateUserPassword, UpdateUserRole};
 use async_trait::async_trait;
 use shared::error::AppResult;
 

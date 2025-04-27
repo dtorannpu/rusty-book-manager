@@ -1,11 +1,11 @@
-use crate::database::model::user::UserRow;
 use crate::database::ConnectionPool;
+use crate::database::model::user::UserRow;
 use async_trait::async_trait;
 use derive_new::new;
 use kernel::model::id::UserId;
 use kernel::model::role::Role;
-use kernel::model::user::event::{CreateUser, DeleteUser, UpdateUserPassword, UpdateUserRole};
 use kernel::model::user::User;
+use kernel::model::user::event::{CreateUser, DeleteUser, UpdateUserPassword, UpdateUserRole};
 use kernel::repository::user::UserRepository;
 use shared::error::{AppError, AppResult};
 

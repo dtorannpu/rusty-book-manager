@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use api::route::{auth, v1};
-use axum::{http::request::Builder, Router};
+use axum::{Router, http::request::Builder};
 use kernel::{
     model::{auth::AccessToken, id::UserId, role::Role, user::User},
     repository::{auth::MockAuthRepository, user::MockUserRepository},

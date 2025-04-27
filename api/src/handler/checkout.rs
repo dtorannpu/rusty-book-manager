@@ -1,8 +1,8 @@
 use crate::extractor::AuthorizedUser;
 use crate::model::checkout::CheckoutsResponse;
+use axum::Json;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::Json;
 use kernel::model::checkout::event::{CreateCheckout, UpdateReturned};
 use kernel::model::id::{BookId, CheckoutId};
 use registry::AppRegistry;

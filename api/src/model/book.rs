@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use derive_new::new;
 use garde::Validate;
 use kernel::model::book::event::UpdateBook;
-use kernel::model::book::{event::CreateBook, Book, BookListOptions, Checkout};
+use kernel::model::book::{Book, BookListOptions, Checkout, event::CreateBook};
 use kernel::model::id::{BookId, CheckoutId, UserId};
 use kernel::model::list::PaginatedList;
 use serde::{Deserialize, Serialize};
