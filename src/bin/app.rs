@@ -53,7 +53,7 @@ fn init_logger() -> Result<SdkTracerProvider> {
     let host = std::env::var("JAEGER_HOST")?;
     let port = std::env::var("JAEGER_PORT")?;
     let endpoint = format!("http://{host}:{port}");
-    println!("Jaeger endpoint {}", endpoint);
+    println!("Jaeger endpoint {endpoint}");
 
     let otlp_exporter = opentelemetry_otlp::SpanExporter::builder()
         .with_tonic()
