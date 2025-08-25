@@ -36,7 +36,7 @@ thiserror = { version = "2.0.16", default-features = false }
 tokio = { version = "1.47.1", features = ["rt-multi-thread", "signal"] }
 mockall = "0.13.1"
 redis = { version = "0.30.0", features = ["tokio-comp"], default-features = false }
-bcrypt = { version = "0.17.0", features = ["std"], default-features = false }
+bcrypt = { version = "0.17.1", features = ["std"], default-features = false }
 tower = "0.5.2"
 tracing = { version = "0.1.41", default-features = false }
 axum-extra = { version = "0.10.1", features = ["typed-header"], default-features = false }
