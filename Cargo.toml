@@ -43,7 +43,7 @@ axum-extra = { version = "0.10.1", features = ["typed-header"], default-features
 tokio-stream = { version = "0.1.17", default-features = false }
 garde = { version = "0.22.0", features = ["derive", "email"] }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
-tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt", "json"], default-features = false }
+tracing-subscriber = { version = "0.3.20", features = ["env-filter", "fmt", "json"], default-features = false }
 utoipa = { version = "5.4.0", features = ["chrono", "uuid"], default-features = false }
 utoipa-redoc = { version = "6.0.0", features = ["axum"] }
 tracing-opentelemetry = { version = "0.30.0", default-features = false }
