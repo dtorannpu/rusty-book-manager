@@ -24,7 +24,7 @@ kernel = { path = "./kernel" }
 shared = { path = "./shared" }
 registry = { path = "./registry" }
 async-trait = { version = "0.1.89" }
-anyhow = { version = "1.0.99", default-features = false }
+anyhow = { version = "1.0.100", default-features = false }
 axum = { version = "0.8.4", features = ["http1", "json", "query", "tokio"], default-features = false }
 derive-new = { version = "0.7.0", default-features = false }
 uuid = { version = "1.18.1", features = ["serde", "v4"], default-features = false }
