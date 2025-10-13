@@ -39,7 +39,7 @@ redis = { version = "0.30.0", features = ["tokio-comp"], default-features = fals
 bcrypt = { version = "0.17.1", features = ["std"], default-features = false }
 tower = "0.5.2"
 tracing = { version = "0.1.41", default-features = false }
-axum-extra = { version = "0.10.2", features = ["typed-header"], default-features = false }
+axum-extra = { version = "0.10.3", features = ["typed-header"], default-features = false }
 tokio-stream = { version = "0.1.17", default-features = false }
 garde = { version = "0.22.0", features = ["derive", "email"] }
 tower-http = { version = "0.6.6", features = ["cors", "trace"] }
