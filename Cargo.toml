@@ -50,7 +50,7 @@ tracing-opentelemetry = { version = "0.30.0", default-features = false }
 opentelemetry = { version = "0.29.1", default-features = false }
 opentelemetry-otlp = { version = "0.29.0", features = ["grpc-tonic", "trace"], default-features = false }
 opentelemetry_sdk = { version = "0.29.0", features = ["rt-tokio"], default-features = false }
-opentelemetry-semantic-conventions = { version = "0.29.0", features = ["semconv_experimental"] }
+opentelemetry-semantic-conventions = { version = "0.31.0", features = ["semconv_experimental"] }
 
 [dependencies]
 tower-http.workspace = true
