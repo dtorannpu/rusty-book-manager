@@ -46,10 +46,10 @@ tower-http = { version = "0.6.6", features = ["cors", "trace"] }
 tracing-subscriber = { version = "0.3.20", features = ["env-filter", "fmt", "json"], default-features = false }
 utoipa = { version = "5.4.0", features = ["chrono", "uuid"], default-features = false }
 utoipa-redoc = { version = "6.0.0", features = ["axum"] }
-tracing-opentelemetry = { version = "0.30.0", default-features = false }
-opentelemetry = { version = "0.29.1", default-features = false }
-opentelemetry-otlp = { version = "0.29.0", features = ["grpc-tonic", "trace"], default-features = false }
-opentelemetry_sdk = { version = "0.29.0", features = ["rt-tokio"], default-features = false }
+tracing-opentelemetry = { version = "0.32.0", default-features = false }
+opentelemetry = { version = "0.31.0", default-features = false }
+opentelemetry-otlp = { version = "0.31.0", features = ["grpc-tonic", "trace"], default-features = false }
+opentelemetry_sdk = { version = "0.31.0", features = ["rt-tokio"], default-features = false }
 opentelemetry-semantic-conventions = { version = "0.31.0", features = ["semconv_experimental"] }
 
 [dependencies]
