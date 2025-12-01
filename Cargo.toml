@@ -38,7 +38,7 @@ mockall = "0.14.0"
 redis = { version = "0.32.7", features = ["tokio-comp"], default-features = false }
 bcrypt = { version = "0.17.1", features = ["std"], default-features = false }
 tower = "0.5.2"
-tracing = { version = "0.1.41", default-features = false }
+tracing = { version = "0.1.43", default-features = false }
 axum-extra = { version = "0.12.2", features = ["typed-header"], default-features = false }
 tokio-stream = { version = "0.1.17", default-features = false }
 garde = { version = "0.22.1", features = ["derive", "email"] }
