@@ -35,14 +35,14 @@ strum = { version = "0.27.2", features = ["derive"] }
 thiserror = { version = "2.0.17", default-features = false }
 tokio = { version = "1.48.0", features = ["rt-multi-thread", "signal"] }
 mockall = "0.14.0"
-redis = { version = "1.0.0", features = ["tokio-comp"], default-features = false }
+redis = { version = "1.0.1", features = ["tokio-comp"], default-features = false }
 bcrypt = { version = "0.17.1", features = ["std"], default-features = false }
 tower = "0.5.2"
 tracing = { version = "0.1.43", default-features = false }
 axum-extra = { version = "0.12.2", features = ["typed-header"], default-features = false }
 tokio-stream = { version = "0.1.17", default-features = false }
 garde = { version = "0.22.1", features = ["derive", "email"] }
-tower-http = { version = "0.6.7", features = ["cors", "trace"] }
+tower-http = { version = "0.6.8", features = ["cors", "trace"] }
 tracing-subscriber = { version = "0.3.22", features = ["env-filter", "fmt", "json"], default-features = false }
 utoipa = { version = "5.4.0", features = ["chrono", "uuid"], default-features = false }
 utoipa-redoc = { version = "6.0.0", features = ["axum"] }
