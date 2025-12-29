@@ -25,4 +25,4 @@ utoipa.workspace = true
 [dev-dependencies]
 anyhow.workspace = true
 rstest = { version = "0.26.1", default-features = false }
-serde_json = { version = "1.0.145", default-features = false }
+serde_json = { version = "1.0.148", default-features = false }
