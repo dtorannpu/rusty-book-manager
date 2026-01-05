@@ -33,7 +33,7 @@ serde = { version = "1.0.228", default-features = false }
 sqlx = { version = "0.8.6", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
 strum = { version = "0.27.2", features = ["derive"] }
 thiserror = { version = "2.0.17", default-features = false }
-tokio = { version = "1.48.0", features = ["rt-multi-thread", "signal"] }
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "signal"] }
 mockall = "0.14.0"
 redis = { version = "1.0.2", features = ["tokio-comp"], default-features = false }
 bcrypt = { version = "0.17.1", features = ["std"], default-features = false }
