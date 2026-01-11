@@ -120,17 +120,23 @@ run_task = "test"
 
 [tasks.migrate]
 extend = "set-env-local"
-install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3" }
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.8.6" }
+script_runner = "@duckscript"
 script = '''
-#!/bin/bash
-until sqlx migrate run --source adapter/migrations; do
-    sleep 1
-done
+exit_code = set 1
+while ${exit_code}
+    result = exec sqlx migrate run --source adapter/migrations
+    exit_code = set ${result.code}
+    if ${exit_code}
+        echo "Migration failed, retrying in 1 second..."
+        sleep 1000
+    end
+end
 '''
 
 [tasks.sqlx]
 extend = "set-env-local"
-install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.7.3" }
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.8.6" }
 command = "sqlx"
 args = ["${@}", "--source", "adapter/migrations"]
 
