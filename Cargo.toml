@@ -35,7 +35,7 @@ strum = { version = "0.27.2", features = ["derive"] }
 thiserror = { version = "2.0.18", default-features = false }
 tokio = { version = "1.49.0", features = ["rt-multi-thread", "signal"] }
 mockall = "0.14.0"
-redis = { version = "1.0.3", features = ["tokio-comp"], default-features = false }
+redis = { version = "1.0.4", features = ["tokio-comp"], default-features = false }
 bcrypt = { version = "0.18.0", features = ["std"], default-features = false }
 tower = "0.5.3"
 tracing = { version = "0.1.44", default-features = false }
