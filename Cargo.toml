@@ -44,7 +44,7 @@ tokio-stream = { version = "0.1.18", default-features = false }
 garde = { version = "0.22.1", features = ["derive", "email"] }
 tower-http = { version = "0.6.8", features = ["cors", "trace"] }
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt", "json"], default-features = false }
-utoipa = { version = "5.4.0", features = ["chrono", "uuid"], default-features = false }
+utoipa = { version = "5.5.0", features = ["chrono", "uuid"], default-features = false }
 utoipa-redoc = { version = "6.0.0", features = ["axum"] }
 tracing-opentelemetry = { version = "0.32.1", default-features = false }
 opentelemetry = { version = "0.31.0", default-features = false }
