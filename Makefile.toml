@@ -120,7 +120,7 @@ run_task = "test"
 
 [tasks.migrate]
 extend = "set-env-local"
-install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.8.6" }
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.9.0" }
 script_runner = "@duckscript"
 script = '''
 exit_code = set 1
@@ -136,7 +136,7 @@ end
 
 [tasks.sqlx]
 extend = "set-env-local"
-install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.8.6" }
+install_crate = { crate_name = "sqlx-cli", binary = "sqlx", test_arg = "--help", version = "0.9.0" }
 command = "sqlx"
 args = ["${@}", "--source", "adapter/migrations"]
 

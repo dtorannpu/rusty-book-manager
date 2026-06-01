@@ -32,7 +32,7 @@ services:
       - ${REDIS_PORT_OUTER}:${REDIS_PORT_INNER}
 
   postgres:
-    image: postgres:15
+    image: postgres:18.4
     command: postgres -c log_destination=stderr -c log_statement=all -c log_connections=on -c log_disconnections=on
     ports:
       - ${DATABASE_PORT_OUTER}:${DATABASE_PORT_INNER}
@@ -49,7 +49,7 @@ services:
       retries: 5
       start_period: 30s
   jaeger:
-    image: jaegertracing/jaeger:${JAEGER_VERSION:-2.1.0}
+    image: jaegertracing/jaeger:${JAEGER_VERSION:-2.18.0}
     ports:
       - "16686:16686"
       - "4317:4317"
