@@ -6,7 +6,7 @@ workflows:
     '.github/workflows/ci.yml':
         - 'actions/checkout@v7.0.1'
         - 'swatinem/rust-cache@v2.9.3'
-        - 'taiki-e/install-action@v2.87.31'
+        - 'taiki-e/install-action@v2.89.0'
 dependencies:
     'actions/checkout@v7.0.1':
         ref: 'v7.0.1'
@@ -18,8 +18,8 @@ dependencies:
         commit: 'sha1-d1527c8f67ef9af357290475d4af4b0fab8f12e0'
         owner_id: 580492
         repo_id: 298565987
-    'taiki-e/install-action@v2.87.31':
-        ref: 'v2.87.31'
-        commit: 'sha1-1e29709c0ec63babbe8f266397a465f29a825f91'
+    'taiki-e/install-action@v2.89.0':
+        ref: 'v2.89.0'
+        commit: 'sha1-1919c4a95903d2c33e4a221102edca87309fc14b'
         owner_id: 43724913
         repo_id: 442947557
